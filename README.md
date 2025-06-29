@@ -1,8 +1,17 @@
-# Voice Assistant with Twilio and Hugging Face Inference Endpoints (Node.js)
+# Voice Assistant with Twilio, HuggingFace, and Tool Calling (Node.js)
 
 (Originally inspired by this [GitHub repo](https://github.com/robinske/cr-demo) from Kelley Robinson at Twilio)
 
-This application demonstrates how to use Node.js, [Twilio Voice](https://www.twilio.com/docs/voice) and [ConversationRelay](https://www.twilio.com/docs/voice/twiml/connect/conversationrelay), and the [Hugging Face Inference API](https://www.npmjs.com/package/@huggingface/inference) with Hugging Face Inference Endpoints to create a voice assistant that can engage in two-way conversations over a phone call.
+This application demonstrates how to use Node.js, [Twilio Voice](https://www.twilio.com/docs/voice) and [ConversationRelay](https://www.twilio.com/docs/voice/twiml/connect/conversationrelay), and the [Hugging Face Inference API](https://www.npmjs.com/package/@huggingface/inference) with Hugging Face Inference Endpoints to create a voice assistant that can engage in two-way conversations over a phone call with **tool calling capabilities**.
+
+## 🚀 New in Part 3: Tool Calling
+
+This version adds function calling capabilities, allowing your AI assistant to:
+- **Fetch real-time data** from external APIs during conversations
+- **Tell programming jokes** using the JokeAPI
+- **Extend functionality** by adding more tools as needed
+
+The AI can now dynamically call external services and incorporate the results into natural voice responses!
 
 ## Prerequisites
 
@@ -61,7 +70,61 @@ Set the HTTP method for the webhook to be `GET`.
 Start the server.
 
 ```bash
-npm run start
+npm start
 ```
 
 Call your Twilio phone number. After connection, you should be able to converse with the AI-powered AI Assistant, integrated over ConversationRelay with Twilio Voice!
+
+## Architecture
+
+This application builds on the previous parts of the series:
+
+- **Part 1**: Basic voice assistant with HuggingFace and MistralAI
+- **Part 2**: Token streaming and interruption handling
+- **Part 3**: Tool calling capabilities (this version)
+
+The tool calling system allows the AI to:
+1. Recognize when external data is needed
+2. Call the appropriate tool function
+3. Fetch real-time data from APIs
+4. Incorporate the results into natural voice responses
+
+## Adding More Tools
+
+To add more tools, edit `src/utils/tools.js`:
+1. Add new tool definitions to the `tools` array
+2. Implement the tool function
+3. Add the case to the `executeTool` function
+
+Example:
+```javascript
+// Add to tools array
+{
+  type: "function",
+  function: {
+    name: "get_weather",
+    description: "Get current weather for a location",
+    parameters: {
+      type: "object",
+      properties: {
+        location: {
+          type: "string",
+          description: "City name"
+        }
+      },
+      required: ["location"]
+    }
+  }
+}
+
+// Add to executeTool function
+case "get_weather":
+  return await getWeather(toolArgs.location);
+```
+
+## Related Blog Posts
+
+This is part 3 of a series on building AI voice assistants with Twilio and HuggingFace:
+- [Part 1: Basic AI Agent with ConversationRelay](https://www.twilio.com/en-us/blog/developers/tutorials/product/ai-agent-conversationrelay-voice-mistral)
+- [Part 2: Token Streaming and Interruption Handling](https://www.twilio.com/en-us/blog/developers/tutorials/product/token-streaming-interruption-handling-twilio-voice-mistral)
+- **Part 3: Tool Calling (this version)**

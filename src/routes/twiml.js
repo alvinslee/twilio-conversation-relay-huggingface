@@ -1,6 +1,6 @@
 import { getWebSocketUrl } from '../utils/url.js';
 
-const WELCOME_GREETING = "Hi! I am a voice assistant powered by Twilio and HuggingFace. Ask me anything!";
+const WELCOME_GREETING = "Hi! I am a voice assistant powered by Twilio and HuggingFace with MistralAI. I can help you with questions and even tell you programming jokes! Ask me anything!";
 
 export default async function twimlRoutes(fastify) {
   fastify.get("/", async (request, reply) => {

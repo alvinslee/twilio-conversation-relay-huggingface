@@ -1,6 +1,10 @@
 import { aiResponseStream } from '../utils/ai.js';
 
-const SYSTEM_PROMPT = "You are a helpful assistant. This conversation is being translated to voice, so answer carefully. When you respond, please spell out all numbers, for example twenty not 20. Do not include emojis in your responses. Do not include bullet points, asterisks, or special symbols. Keep your responses concise and direct.";
+const SYSTEM_PROMPT = `You are a helpful assistant with access to external tools. This conversation is being translated to voice, so answer carefully. When you respond, please spell out all numbers, for example twenty not 20. Do not include emojis in your responses. Do not include bullet points, asterisks, or special symbols. Keep your responses concise and direct.
+
+You have access to a tool that can fetch programming jokes. If someone asks for a joke, programming humor, or anything related to jokes, use the get_programming_joke tool to fetch a relevant joke and then incorporate it into your response naturally. Do not incorporate humor or fetch a joke for your respons unless you are explicitly asked to do so.
+
+Remember to speak naturally and conversationally, as this is a voice conversation.`;
 const sessions = new Map();
 
 function handleInterrupt(callSid, utteranceUntilInterrupt) {
@@ -60,7 +64,16 @@ export default async function websocketRoutes(fastify) {
           sessionData.conversation.push({ role: "user", content: message.voicePrompt });
           const response = await aiResponseStream(sessionData.conversation, ws);
           if (response) {
-            sessionData.conversation.push({ role: "assistant", content: response });
+            // Check if the last message was a tool call
+            const lastMessage = sessionData.conversation[sessionData.conversation.length - 1];
+            if (lastMessage && lastMessage.role === "assistant" && lastMessage.tool_calls) {
+              // Tool call was already added to conversation in aiResponseStream
+              // Just add the final response
+              sessionData.conversation.push({ role: "assistant", content: response });
+            } else {
+              // Regular response
+              sessionData.conversation.push({ role: "assistant", content: response });
+            }
           }
           break;
           
