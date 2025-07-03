@@ -59,6 +59,7 @@ export default async function websocketRoutes(fastify) {
           break;
           
         case "prompt":
+          console.log("\n");
           console.log("Processing prompt:", message.voicePrompt);
           const sessionData = sessions.get(ws.callSid);
           sessionData.conversation.push({ role: "user", content: message.voicePrompt });

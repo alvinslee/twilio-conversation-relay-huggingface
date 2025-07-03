@@ -12,7 +12,7 @@ export const tools = [
           category: {
             type: "string",
             description: "The category of joke to fetch",
-            enum: ["programming", "pun", "dark", "misc"]
+            enum: ["programming"]
           }
         },
         required: ["category"]
